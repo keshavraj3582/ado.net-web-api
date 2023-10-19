@@ -39,3 +39,4 @@ C:\Users\DELL\OneDrive - Odin Education Foundation\Desktop\demo_project\Ado.net\
 C:\Users\DELL\OneDrive - Odin Education Foundation\Desktop\demo_project\Ado.net\obj\Debug\net7.0\Ado.net.pdb
 C:\Users\DELL\OneDrive - Odin Education Foundation\Desktop\demo_project\Ado.net\obj\Debug\net7.0\Ado.net.genruntimeconfig.cache
 C:\Users\DELL\OneDrive - Odin Education Foundation\Desktop\demo_project\Ado.net\obj\Debug\net7.0\ref\Ado.net.dll
+C:\Users\DELL\OneDrive - Odin Education Foundation\Desktop\demo_project\Ado.net\bin\Debug\net7.0\CsvHelper.dll

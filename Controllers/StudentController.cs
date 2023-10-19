@@ -4,6 +4,13 @@ using System.Data.SqlClient;
 using System.Data;
 using AdoNet.Models;
 using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Http.HttpResults;
+using static System.Collections.Specialized.BitVector32;
+using CsvHelper.Configuration;
+using CsvHelper;
+using System.Collections.Generic;
+using System.Globalization;
+using AdoNet.Models;
 
 namespace AdoNet.Controllers
 {
@@ -243,34 +250,79 @@ namespace AdoNet.Controllers
             finally { connString.Close(); }
         }
 
+        [HttpPut]
 
-        [HttpPatch]
         [Route("UpdateStudent/{id}")]
-        public async Task<IActionResult> UpdateStudent(string id, [FromBody] JsonPatchDocument<Student> patchDoc)
+
+        public async Task<IActionResult> UpdateStudent(string id, [FromBody] Student updatedStudent)
         {
-            if (patchDoc == null)
+
+            if (updatedStudent == null || string.IsNullOrWhiteSpace(id))
+
             {
-                return BadRequest("Invalid patch document.");
+
+                return BadRequest("Invalid data or ID.");
+
             }
+
+
 
             connString = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
 
+
+
             try
+
             {
+
                 connString.Open();
 
-                // Assuming patchDoc.Operations[0].path contains the column name to update
-                string columnNameToUpdate = patchDoc.Operations[0].path;
-                object newValue = patchDoc.Operations[0].value;
 
-                // Using parameterized query to avoid SQL injection
-                string query = "UPDATE student SET " + columnNameToUpdate + " = @NewValue WHERE Student_ID = @StudentID";
+
+                // Use a parameterized query to update the student's record
+
+                string query = "UPDATE Student SET " +
+                    "Student_ID = @StudentID, " +
+                    "Gender = @Gender, " +
+                    "Nationality = @Nationality, " +
+                    "PlaceOfBirth = @PlaceOfBirth, " +
+                    "StageID = @StageID, " +
+                    "GradeID = @GradeID, " +
+                    "SectionID = @SectionID, " +
+                    "Topic = @Topic, " +
+                    "Semester = @Semester, " +
+                    "Relation = @Relation, " +
+                    "RaisedHands = @RaisedHands, " +
+                    "VisitedResources = @VisitedResources, " +
+                    "AnnouncementsView = @AnnouncementsView, " +
+                    "Discussion = @Discussion, " +
+                    "ParentAnsweringSurvey = @ParentAnsweringSurvey, " +
+                    "ParentSchoolSatisfaction = @ParentSchoolSatisfaction, " +
+                    "StudentAbsenceDays = @StudentAbsenceDays, " +
+                    "Student_Marks = @StudentMarks, " +
+                    "Class = @Class " +
+                    "WHERE Student_ID = @StudentID";
                 SqlCommand cmd = new SqlCommand(query, connString);
-                cmd.Parameters.AddWithValue("@NewValue", newValue);
                 cmd.Parameters.AddWithValue("@StudentID", id);
-
+                cmd.Parameters.AddWithValue("@Gender", updatedStudent.Gender);
+                cmd.Parameters.AddWithValue("@Nationality", updatedStudent.Nationality);
+                cmd.Parameters.AddWithValue("@PlaceOfBirth", updatedStudent.PlaceOfBirth);
+                cmd.Parameters.AddWithValue("@StageID", updatedStudent.StageID);
+                cmd.Parameters.AddWithValue("@GradeID", updatedStudent.GradeID);
+                cmd.Parameters.AddWithValue("@SectionID", updatedStudent.SectionID);
+                cmd.Parameters.AddWithValue("@Topic", updatedStudent.Topic);
+                cmd.Parameters.AddWithValue("@Semester", updatedStudent.Semester);
+                cmd.Parameters.AddWithValue("@Relation", updatedStudent.Relation);
+                cmd.Parameters.AddWithValue("@RaisedHands", updatedStudent.RaisedHands);
+                cmd.Parameters.AddWithValue("@VisitedResources", updatedStudent.VisitedResources);
+                cmd.Parameters.AddWithValue("@AnnouncementsView", updatedStudent.AnnouncementsView);
+                cmd.Parameters.AddWithValue("@Discussion", updatedStudent.Discussion);
+                cmd.Parameters.AddWithValue("@ParentAnsweringSurvey", updatedStudent.ParentAnsweringSurvey);
+                cmd.Parameters.AddWithValue("@ParentSchoolSatisfaction", updatedStudent.ParentSchoolSatisfaction);
+                cmd.Parameters.AddWithValue("@StudentAbsenceDays", updatedStudent.StudentAbsenceDays);
+                cmd.Parameters.AddWithValue("@StudentMarks", updatedStudent.StudentMarks);
+                cmd.Parameters.AddWithValue("@Class", updatedStudent.Class);
                 int rowsAffected = cmd.ExecuteNonQuery();
-
                 if (rowsAffected > 0)
                 {
                     return Ok("Student updated successfully.");
@@ -282,13 +334,104 @@ namespace AdoNet.Controllers
             }
             catch (Exception ex)
             {
+
                 return StatusCode(500, "Internal server error: " + ex.Message);
+
             }
+
             finally
+
             {
+
                 connString.Close();
+
+            }
+
+        }//update action
+        [Route("ImportCsv")]
+        [HttpPost]
+        public IActionResult ImportCsv(IFormFile file)
+        {
+            if (file == null)
+            {
+                return BadRequest("No file uploaded.");
+            }
+
+            using (var reader = new StreamReader(file.OpenReadStream()))
+            using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)))
+            {
+                IEnumerable<Student> csvData = csv.GetRecords<Student>();
+
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    connection.Open();
+
+                    foreach (var csvStudent in csvData)
+                    {
+                        if (!IsDuplicateStudent(connection, csvStudent.StudentID))
+                        {
+                            InsertCsvStudent(connection, csvStudent);
+                        }
+                    }
+
+                    connection.Close();
+                }
+            }
+
+            return Ok("CSV data imported successfully.");
+        }
+        private bool IsDuplicateStudent(SqlConnection connection, string studentId)
+        {
+            using (var command = new SqlCommand("SELECT COUNT(*) FROM student WHERE Student_ID = @Student_ID", connection))
+            {
+                command.Parameters.AddWithValue("@Student_ID", studentId);
+                int count = Convert.ToInt32(command.ExecuteScalar());
+                return count > 0;
             }
         }
 
-    }
-}
+        private void InsertCsvStudent(SqlConnection connection, Student csvStudent)
+        {
+            using (var command = new SqlCommand("INSERT INTO student VALUES (@Student_ID, @Gender, @NationalITy, @PlaceofBirth, @StageID, @GradeID, @SectionID, @Topic, @Semester, @Relation, @raisedhands, @VisITedResources, @AnnouncementsView, @Discussion, @ParentAnsweringSurvey, @ParentschoolSatisfaction, @StudentAbsenceDays, @Student_Marks, @Class)", connection))
+            {
+                command.Parameters.AddWithValue("@Student_ID", csvStudent.StudentID);
+                command.Parameters.AddWithValue("@Gender", csvStudent.Gender);
+                command.Parameters.AddWithValue("@NationalITy", csvStudent.Nationality);
+                command.Parameters.AddWithValue("@PlaceofBirth", csvStudent.PlaceOfBirth);
+                command.Parameters.AddWithValue("@StageID", csvStudent.StageID);
+                command.Parameters.AddWithValue("@GradeID", csvStudent.GradeID);
+                command.Parameters.AddWithValue("@SectionID", csvStudent.SectionID);
+                command.Parameters.AddWithValue("@Topic", csvStudent.Topic);
+                command.Parameters.AddWithValue("@Semester", csvStudent.Semester);
+                command.Parameters.AddWithValue("@Relation", csvStudent.Relation);
+                command.Parameters.AddWithValue("@raisedhands", csvStudent.RaisedHands);
+                command.Parameters.AddWithValue("@VisITedResources", csvStudent.VisitedResources);
+                command.Parameters.AddWithValue("@AnnouncementsView", csvStudent.AnnouncementsView);
+                command.Parameters.AddWithValue("@Discussion", csvStudent.Discussion);
+                command.Parameters.AddWithValue("@ParentAnsweringSurvey", csvStudent.ParentAnsweringSurvey);
+                command.Parameters.AddWithValue("@ParentschoolSatisfaction", csvStudent.ParentSchoolSatisfaction);
+                command.Parameters.AddWithValue("@StudentAbsenceDays", csvStudent.StudentAbsenceDays);
+                command.Parameters.AddWithValue("@Student_Marks", csvStudent.StudentMarks);
+                command.Parameters.AddWithValue("@Class", csvStudent.Class);
+                command.ExecuteNonQuery();
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //-------------------------------------------------------------------------------->
+
+    }//controller class
+}//Namespace
+

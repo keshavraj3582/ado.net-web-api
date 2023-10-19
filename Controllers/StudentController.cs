@@ -11,6 +11,9 @@ using CsvHelper;
 using System.Collections.Generic;
 using System.Globalization;
 using AdoNet.Models;
+using ClosedXML;
+using ClosedXML.Excel;
+using Microsoft.Extensions.Configuration;
 
 namespace AdoNet.Controllers
 {
@@ -278,9 +281,6 @@ namespace AdoNet.Controllers
                 connString.Open();
 
 
-
-                // Use a parameterized query to update the student's record
-
                 string query = "UPDATE Student SET " +
                     "Student_ID = @StudentID, " +
                     "Gender = @Gender, " +
@@ -417,6 +417,74 @@ namespace AdoNet.Controllers
             }
         }
 
+        private readonly string _connectionString = "Server=DESKTOP-1K8UJFM\\SQLEXPRESS;Database=api_student_database;Trusted_Connection=True;Encrypt=False;";
+
+        [HttpGet("export")]
+        public IActionResult ExportToExcel()
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+
+                    using (var command = new SqlCommand("SELECT Student_ID, gender, NationalITy, PlaceOfBirth, StageID, GradeID, SectionID, Topic, Semester, Relation, raisedhands, VisITedResources, AnnouncementsView, Discussion, ParentAnsweringSurvey, ParentschoolSatisfaction, StudentAbsenceDays, Student_Marks, Class FROM student", connection))
+                    using (var reader = command.ExecuteReader())
+                    {
+                        var dataTable = new DataTable();
+                        dataTable.Load(reader);
+
+                        using (var workbook = new XLWorkbook())
+                        {
+                            var worksheet = workbook.Worksheets.Add("student");
+                            worksheet.Cell(1, 1).InsertTable(dataTable);
+                            worksheet.Columns().AdjustToContents();
+
+                            using (var stream = new System.IO.MemoryStream())
+                            {
+                                workbook.SaveAs(stream);
+                                var content = stream.ToArray();
+                                return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Students.xlsx");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Error exporting data to Excel: " + ex.Message);
+            }
+        }
+
+     
+
+        [HttpDelete("database")]
+        public IActionResult TruncateDatabase()
+        {
+            try
+            {
+                string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+
+                    
+                    using (var command = new SqlCommand("TRUNCATE TABLE student", connection))
+                    {
+                        command.ExecuteNonQuery();
+                    }
+                }
+
+                return Ok("Database truncated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to truncate the database: {ex.Message}");
+            }
+        }
+    }
+}//namespace
 
 
 
@@ -429,9 +497,8 @@ namespace AdoNet.Controllers
 
 
 
+    //-------------------------------------------------------------------------------->
 
-        //-------------------------------------------------------------------------------->
-
-    }//controller class
-}//Namespace
+//controller class
+//Namespace
 

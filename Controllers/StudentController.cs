@@ -14,6 +14,7 @@ using AdoNet.Models;
 using ClosedXML;
 using ClosedXML.Excel;
 using Microsoft.Extensions.Configuration;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace AdoNet.Controllers
 {
@@ -22,16 +23,15 @@ namespace AdoNet.Controllers
     public class StudentController : ControllerBase
     {
         private readonly IConfiguration _configuration;
+        private readonly ILogger<StudentController> _logger;
 
-
-
-        public StudentController(IConfiguration configuration)
+        public StudentController(ILogger<StudentController> logger,IConfiguration configuration)
 
         {
-
+            _logger = logger;
             _configuration = configuration;
-
         }
+
         SqlConnection connString;
         SqlCommand cmd;
         SqlDataAdapter adap;
@@ -56,9 +56,6 @@ namespace AdoNet.Controllers
             SqlDataAdapter adapter = new SqlDataAdapter(cmd);
 
             adapter.Fill(dt);
-
-
-
             List<Student> lstprofiles = new List<Student>();
 
             foreach (DataRow dr in dt.Rows)
@@ -107,9 +104,6 @@ namespace AdoNet.Controllers
 
                     Class = dr["Class"].ToString()
 
-
-
-
                 });
 
             }
@@ -121,17 +115,13 @@ namespace AdoNet.Controllers
 
 
         [Route("CreateStudent")]
-
         [HttpPost]
 
         public async Task<IActionResult> CreateStudent(Student obj)
 
         {
-
             try
-
             {
-
                 SqlConnection con = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
 
                 SqlCommand cmd = new SqlCommand("insert into student values ('" + obj.StudentID + "','" + obj.Gender + "','" + obj.Nationality + "','" + obj.PlaceOfBirth + "','" + obj.StageID + "', '" + obj.GradeID + "','" + obj.SectionID + "' ,'" + obj.Topic + "' ,'" + obj.Semester + "' , '" + obj.Relation + "' , '" + obj.RaisedHands + "','" + obj.VisitedResources + "','" + obj.AnnouncementsView + "','" + obj.Discussion + "', '" + obj.ParentAnsweringSurvey + "', '" + obj.ParentSchoolSatisfaction + "', '" + obj.StudentAbsenceDays + "', '" + obj.StudentMarks + "', '" + obj.Class + "' )", con);
@@ -141,7 +131,7 @@ namespace AdoNet.Controllers
                 cmd.ExecuteNonQuery();
 
                 con.Close();
-
+                _logger.LogInformation("Student created successfully: StudentID = {StudentID}", obj.StudentID);
                 return Ok("Success");
 
             }
@@ -149,7 +139,7 @@ namespace AdoNet.Controllers
             catch (Exception ex)
 
             {
-
+                _logger.LogError("Error creating a student: {ErrorMessage}", ex.Message);
                 throw ex;
 
             }
@@ -213,7 +203,7 @@ namespace AdoNet.Controllers
                     Class = dr["Class"].ToString()
 
                 };
-
+                _logger.LogInformation("Student found successfully: StudentID = {StudentID}", id);
                 if (dtb.Rows.Count > 0)
                 {
                     return Ok(lstprofile);
@@ -223,6 +213,7 @@ namespace AdoNet.Controllers
             }
             catch (Exception ef)
             {
+                _logger.LogError("Error Finding  the  student with specified id : {ErrorMessage}", ef.Message);
                 return Ok(ef.Message);
             }
             finally { connString.Close(); }
@@ -243,11 +234,13 @@ namespace AdoNet.Controllers
                 if (x > 0)
                 {
                     return Ok(new { Message = "Record Deleted!" });
+                    _logger.LogInformation("Student Deleted successfully: StudentID = {StudentID}", id);
                 }
                 return BadRequest(new { Message = "Record Not found!" });
             }
             catch (Exception ef)
             {
+                _logger.LogError("Error Finding  the  student with specified id : {ErrorMessage}", ef.Message);
                 return BadRequest(ef.Message);
             }
             finally { connString.Close(); }
@@ -261,26 +254,14 @@ namespace AdoNet.Controllers
         {
 
             if (updatedStudent == null || string.IsNullOrWhiteSpace(id))
-
             {
-
                 return BadRequest("Invalid data or ID.");
-
             }
-
-
-
             connString = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-
-
-
             try
 
             {
-
                 connString.Open();
-
-
                 string query = "UPDATE Student SET " +
                     "Student_ID = @StudentID, " +
                     "Gender = @Gender, " +
@@ -325,15 +306,19 @@ namespace AdoNet.Controllers
                 int rowsAffected = cmd.ExecuteNonQuery();
                 if (rowsAffected > 0)
                 {
+                    _logger.LogInformation("Student Deleted successfully: StudentID = {StudentID}", id);
                     return Ok("Student updated successfully.");
                 }
                 else
                 {
+                    _logger.LogError("Error Finding  the  student with specified id : {ErrorMessage}");
                     return NotFound("Student not found.");
                 }
             }
             catch (Exception ex)
             {
+                _logger.LogError("Error Finding  the  student with specified id : {ErrorMessage}", ex.Message);
+
 
                 return StatusCode(500, "Internal server error: " + ex.Message);
 
@@ -377,7 +362,7 @@ namespace AdoNet.Controllers
                     connection.Close();
                 }
             }
-
+            _logger.LogInformation("Student Data imported Successfully: StudentID ");
             return Ok("CSV data imported successfully.");
         }
         private bool IsDuplicateStudent(SqlConnection connection, string studentId)
@@ -452,9 +437,10 @@ namespace AdoNet.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError("Error Finding  the  student with specified id : {ErrorMessage}", ex.Message);
                 return BadRequest("Error exporting data to Excel: " + ex.Message);
             }
-        }
+        }   
 
      
 
@@ -480,6 +466,7 @@ namespace AdoNet.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError("Error Finding  the  student with specified id : {ErrorMessage}", ex.Message);
                 return BadRequest($"Failed to truncate the database: {ex.Message}");
             }
         }
@@ -497,8 +484,4 @@ namespace AdoNet.Controllers
 
 
 
-    //-------------------------------------------------------------------------------->
-
-//controller class
-//Namespace
 

@@ -13,7 +13,8 @@ builder.Services.AddCors(options =>
         });
 });
 
-
+builder.Logging.AddConsole(); 
+builder.Logging.AddDebug();
 
 var app = builder.Build();
 app.UseCors();
@@ -23,6 +24,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 app.UseAuthorization();
 

@@ -4,14 +4,15 @@ using System.Data.SqlClient;
 using System.Data;
 using AdoNet.Models;
 
+
 namespace Ado.net.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SoftDeleteController : ControllerBase
+    public class RecoverDataController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        public SoftDeleteController(IConfiguration configuration)
+        public RecoverDataController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -28,7 +29,7 @@ namespace Ado.net.Controllers
             try
             {
                 dtb = new DataTable();
-                cmd = new SqlCommand("select * from StudentBackup ", connString);
+                cmd = new SqlCommand("select * from studentBackup ", connString);
                 connString.Open();
                 adap = new SqlDataAdapter(cmd);
                 adap.Fill(dtb);

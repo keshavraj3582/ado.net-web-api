@@ -103,6 +103,29 @@
           "lib/netstandard1.6/Irony.dll": {}
         }
       },
+      "MatBlazor/2.10.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Components": "6.0.14",
+          "Microsoft.AspNetCore.Components.Web": "6.0.14"
+        },
+        "compile": {
+          "lib/net6.0/MatBlazor.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/MatBlazor.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/MatBlazor.props": {}
+        },
+        "buildMultiTargeting": {
+          "buildMultiTargeting/MatBlazor.props": {}
+        }
+      },
       "Microsoft.AspNetCore.Authorization/7.0.1": {
         "type": "package",
         "dependencies": {
@@ -2026,6 +2049,25 @@
         "lib/net452/Irony.dll",
         "lib/net461/Irony.dll",
         "lib/netstandard1.6/Irony.dll"
+      ]
+    },
+    "MatBlazor/2.10.0": {
+      "sha512": "VyxrSrtNxsj4XmFu5QI5CcBGGRMcFXfYmVGrTwuMhRkT052qXQii4c0lSgUMgTo4Ii11dMw/xr1wjosh3mA7LA==",
+      "type": "package",
+      "path": "matblazor/2.10.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/MatBlazor.props",
+        "build/Microsoft.AspNetCore.StaticWebAssets.props",
+        "buildMultiTargeting/MatBlazor.props",
+        "buildTransitive/MatBlazor.props",
+        "lib/net6.0/MatBlazor.dll",
+        "lib/net6.0/MatBlazor.xml",
+        "matblazor.2.10.0.nupkg.sha512",
+        "matblazor.nuspec",
+        "staticwebassets/dist/matBlazor.css",
+        "staticwebassets/dist/matBlazor.js"
       ]
     },
     "Microsoft.AspNetCore.Authorization/7.0.1": {
@@ -6406,6 +6448,7 @@
       "Blazored.Toast >= 4.1.0",
       "ClosedXML >= 0.102.1",
       "CsvHelper >= 30.0.1",
+      "MatBlazor >= 2.10.0",
       "Microsoft.AspNetCore.JsonPatch >= 7.0.12",
       "Microsoft.AspNetCore.OpenApi >= 7.0.11",
       "Swashbuckle.AspNetCore >= 6.5.0",
@@ -6462,6 +6505,10 @@
           "CsvHelper": {
             "target": "Package",
             "version": "[30.0.1, )"
+          },
+          "MatBlazor": {
+            "target": "Package",
+            "version": "[2.10.0, )"
           },
           "Microsoft.AspNetCore.JsonPatch": {
             "target": "Package",

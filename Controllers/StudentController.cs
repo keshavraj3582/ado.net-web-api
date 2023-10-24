@@ -224,23 +224,34 @@ namespace AdoNet.Controllers
         [HttpDelete] //DELETE
         public ActionResult Delete(string id)
         {
+            SqlConnection connString;
+            SqlCommand cmd;
+            SqlDataAdapter adap;
+            DataTable dtb;
+            connString = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+
             try
             {
-                connString = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+                dtb = new DataTable();
+                cmd = new SqlCommand("select * from student where Student_ID=@StudentID", connString);
+                cmd.Parameters.AddWithValue("@StudentID ", id);
+                connString.Open();
+                adap = new SqlDataAdapter(cmd);
+                adap.Fill(dtb);
+                DataRow dr = dtb.Rows[0];
+                cmd = new SqlCommand("insert into studentBackup values ('" + dr["Student_ID"] + "','" + dr["gender"] + "','" + dr["NationalITy"] + "','" + dr["PlaceOfBirth"] + "','" + dr["StageID"] + "', '" + dr["GradeID"] + "','" + dr["SectionID"] + "' ,'" + dr["Topic"] + "' ,'" + dr["Semester"] + "' , '" + dr["Relation"] + "' , '" + dr["raisedhands"] + "','" + dr["VisITedResources"] + "','" + dr["AnnouncementsView"] + "','" + dr["Discussion"] + "', '" + dr["ParentAnsweringSurvey"] + "', '" + dr["ParentschoolSatisfaction"] + "', '" + dr["StudentAbsenceDays"] + "', '" + dr["Student_Marks"] + "', '" + dr["Class"] + "'  )", connString);
+                cmd.ExecuteNonQuery();
                 cmd = new SqlCommand("delete from student where Student_ID=@StudentID" + "", connString);
                 cmd.Parameters.AddWithValue("@StudentID", id);
-                connString.Open();
                 int x = cmd.ExecuteNonQuery();
                 if (x > 0)
                 {
                     return Ok(new { Message = "Record Deleted!" });
-                    _logger.LogInformation("Student Deleted successfully: StudentID = {StudentID}", id);
                 }
                 return BadRequest(new { Message = "Record Not found!" });
             }
             catch (Exception ef)
             {
-                _logger.LogError("Error Finding  the  student with specified id : {ErrorMessage}", ef.Message);
                 return BadRequest(ef.Message);
             }
             finally { connString.Close(); }

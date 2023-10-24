@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "mh3VmTQfWXR1c+y3eu/H+3+X9sfRI208/6+33167EAEr2nD9BE44bqroj6ydiHsqstqxNksFXFLIQJnm+O4Bzw==",
+  "dgSpecHash": "SX+TlCUOTtzJxLCnVDQuTqG3lB971TghvzjfnCoJZlGpFGfzvNRFUfnFqYpt6h6tNo5hlwOPhwNNDHvoEQqu9w==",
   "success": true,
   "projectFilePath": "C:\\Users\\DELL\\OneDrive - Odin Education Foundation\\Desktop\\demo_project\\Ado.net\\Ado.net.csproj",
   "expectedPackageFiles": [
@@ -10,6 +10,7 @@
     "C:\\Users\\DELL\\.nuget\\packages\\documentformat.openxml\\2.16.0\\documentformat.openxml.2.16.0.nupkg.sha512",
     "C:\\Users\\DELL\\.nuget\\packages\\excelnumberformat\\1.1.0\\excelnumberformat.1.1.0.nupkg.sha512",
     "C:\\Users\\DELL\\.nuget\\packages\\irony.netcore\\1.0.11\\irony.netcore.1.0.11.nupkg.sha512",
+    "C:\\Users\\DELL\\.nuget\\packages\\matblazor\\2.10.0\\matblazor.2.10.0.nupkg.sha512",
     "C:\\Users\\DELL\\.nuget\\packages\\microsoft.aspnetcore.authorization\\7.0.1\\microsoft.aspnetcore.authorization.7.0.1.nupkg.sha512",
     "C:\\Users\\DELL\\.nuget\\packages\\microsoft.aspnetcore.components\\7.0.1\\microsoft.aspnetcore.components.7.0.1.nupkg.sha512",
     "C:\\Users\\DELL\\.nuget\\packages\\microsoft.aspnetcore.components.analyzers\\7.0.1\\microsoft.aspnetcore.components.analyzers.7.0.1.nupkg.sha512",

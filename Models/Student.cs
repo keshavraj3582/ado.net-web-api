@@ -6,14 +6,16 @@ using System.ComponentModel.DataAnnotations;
 namespace AdoNet.Models
 {
     public class Student
-    {
+    { 
+        [Name("StudentID")]
         [Required(ErrorMessage = "Student ID is Required")]
-        [RegularExpression("^STDN\\d{5}$", ErrorMessage = "Student ID should start with 'STDN' then 5 digits.")]
+        [RegularExpression(@"^STDN\d{5}$", ErrorMessage = "Student ID should start with 'STDN' then 5 digits.")]
         public string StudentID { get; set; } = null!;
+        //[CustomGenderValidation(ErrorMessage = "Gender should be 'M', 'F', or null.")]
 
         //[Name("gender")]
-        //[RegularExpression(@"^[MF]$", ErrorMessage = "Gender must be 'M' or 'F'.")]
-        public string? Gender { get; set; }
+        // [RegularExpression(@"^[MF]$", ErrorMessage = "Gender must be 'M' or 'F'.")]
+        public string? Gender { get; set; } 
 
         //[Name("NationalITy")]
         //[RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "Nationality must only contain Alphabets and White Space.")]
@@ -83,4 +85,22 @@ namespace AdoNet.Models
         //[RegularExpression(@"^[MLH]$", ErrorMessage = "Class must be 'M' or 'L' or 'H'.")]
         public string? Class { get; set; }
     }
+//    public class CustomGenderValidationAttribute : ValidationAttribute
+//    {
+//        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+//        {
+//            if (value == null)
+//            {
+//                return ValidationResult.Success;
+//            }
+
+//            string gender = value as string;
+//            if (gender == "M" || gender == "F")
+//            {
+//                return ValidationResult.Success;
+//            }
+
+//            return new ValidationResult(ErrorMessage);
+//        }
+//    }
 }

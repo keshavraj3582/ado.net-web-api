@@ -55,3 +55,4 @@ C:\Users\DELL\OneDrive - Odin Education Foundation\Desktop\demo_project\Ado.net\
 C:\Users\DELL\OneDrive - Odin Education Foundation\Desktop\demo_project\Ado.net\bin\Debug\net7.0\Microsoft.AspNetCore.Components.Web.dll
 C:\Users\DELL\OneDrive - Odin Education Foundation\Desktop\demo_project\Ado.net\bin\Debug\net7.0\Microsoft.AspNetCore.Metadata.dll
 C:\Users\DELL\OneDrive - Odin Education Foundation\Desktop\demo_project\Ado.net\bin\Debug\net7.0\Microsoft.JSInterop.dll
+C:\Users\DELL\OneDrive - Odin Education Foundation\Desktop\demo_project\Ado.net\bin\Debug\net7.0\MatBlazor.dll
